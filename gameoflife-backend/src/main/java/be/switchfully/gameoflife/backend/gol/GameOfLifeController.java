@@ -19,8 +19,10 @@ public class GameOfLifeController {
     @PostMapping(value = "/phase")
     public List<List<Boolean>> nextGeneration(@RequestBody List<List<Boolean>> currentWorld){
         logger.info(currentWorld);
-        Collections.shuffle(currentWorld);
-        return currentWorld;
+        //Collections.shuffle(currentWorld);
+
+        NextWorldGenerator nextWorldGenerator = new NextWorldGenerator(currentWorld);
+        return nextWorldGenerator.getNextWorld();
     }
 
 }
