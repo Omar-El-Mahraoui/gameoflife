@@ -5,43 +5,63 @@ import java.util.List;
 
 public class NextWorldGenerator {
 
-    private List<List<Boolean>> currentWorldCopy;
+    private List<List<Boolean>> currentWorld;
+    private List<List<Boolean>> nextWorld;
 
     NextWorldGenerator(List<List<Boolean>> currentWorld) {
-        currentWorldCopy = new ArrayList<>();
-        for (List<Boolean> row : currentWorld) {
-            currentWorldCopy.add(row);
+        this.currentWorld = currentWorld;
+        nextWorld = new ArrayList<>();
+        for (int row=0; row<currentWorld.size(); row++) {
+            List<Boolean> rowListInTheBoard = new ArrayList<>();
+            for (int column=0; column<currentWorld.get(0).size(); column++) {
+                Boolean gridElement = currentWorld.get(row).get(column);
+                rowListInTheBoard.add(gridElement);
+            }
+            nextWorld.add(rowListInTheBoard);
         }
     }
 
     public List<List<Boolean>> getNextWorld() {
-        for (int row = 0; row < currentWorldCopy.size(); row++) {
-            for (int column = 0; column < currentWorldCopy.get(0).size(); column++) {
-                decideActionForCoordinate(new Coordinate(row, column));
+        for (int row = 0; row < currentWorld.size(); row++) {
+            for (int column = 0; column < currentWorld.get(0).size(); column++) {
+                applyTheRulesForTheNextWorld(new Coordinate(row, column));
             }
         }
-        return currentWorldCopy;
+        return nextWorld;
     }
 
 
-    private void decideActionForCoordinate(Coordinate coordinate) {
-        if (currentWorldCopy.get(coordinate.getRow()).get(coordinate.getColumn())) {
-            if (countAmountOfTrueNeighbours(coordinate) == 0
-                    || countAmountOfTrueNeighbours(coordinate) == 1
-                    || countAmountOfTrueNeighbours(coordinate) >= 4) {
-                currentWorldCopy.get(coordinate.getRow()).set(coordinate.getColumn(),false);
-            } else if (countAmountOfTrueNeighbours(coordinate) == 2
-                    || countAmountOfTrueNeighbours(coordinate) == 3) {
-                currentWorldCopy.get(coordinate.getRow()).set(coordinate.getColumn(),true);
+    private void applyTheRulesForTheNextWorld(Coordinate coordinate) {
+        if (currentCoordinateIsTrue(coordinate)) {
+            if (coordinateHas0Or1OrMoreThan4TrueNeighbours(coordinate)) {
+                setCoordinateOnFalse(coordinate);
             }
         } else {
-            if (countAmountOfTrueNeighbours(coordinate) == 3) {
-                currentWorldCopy.get(coordinate.getRow()).set(coordinate.getColumn(),false);
+            if (getAmountOfTrueNeighbours(coordinate) == 3) {
+                setCoordinateOnTrue(coordinate);
             }
         }
     }
 
-    private int countAmountOfTrueNeighbours(Coordinate coordinate) {
+    private void setCoordinateOnTrue(Coordinate coordinate) {
+        nextWorld.get(coordinate.getRow()).set(coordinate.getColumn(),true);
+    }
+
+    private void setCoordinateOnFalse(Coordinate coordinate) {
+        nextWorld.get(coordinate.getRow()).set(coordinate.getColumn(),false);
+    }
+
+    private Boolean coordinateHas0Or1OrMoreThan4TrueNeighbours(Coordinate coordinate) {
+        return getAmountOfTrueNeighbours(coordinate) == 0
+                || getAmountOfTrueNeighbours(coordinate) == 1
+                || getAmountOfTrueNeighbours(coordinate) >= 4;
+    }
+
+    private Boolean currentCoordinateIsTrue(Coordinate coordinate) {
+        return currentWorld.get(coordinate.getRow()).get(coordinate.getColumn());
+    }
+
+    private int getAmountOfTrueNeighbours(Coordinate coordinate) {
         int numberOfTrueNeighbours = 0;
         if (eastNeighbourIsTrue(coordinate)) { numberOfTrueNeighbours++; }
         if (southEastNeighbourIsTrue(coordinate)) { numberOfTrueNeighbours++; }
@@ -54,65 +74,66 @@ public class NextWorldGenerator {
         return numberOfTrueNeighbours;
     }
 
-    private boolean eastNeighbourIsTrue(Coordinate coordinate) {
-        if (coordinate.getColumn()+1 >= currentWorldCopy.get(0).size()) {
+    private Boolean eastNeighbourIsTrue(Coordinate coordinate) {
+        if (coordinate.getColumn()+1 >= currentWorld.get(0).size()) {
             return false;
         }
-        return currentWorldCopy.get(coordinate.getRow()).get(coordinate.getColumn()+1);
+        return currentWorld.get(coordinate.getRow()).get(coordinate.getColumn()+1);
     }
 
-    private boolean southEastNeighbourIsTrue(Coordinate coordinate) {
-        if (coordinate.getRow()+1 >= currentWorldCopy.size()
-                || coordinate.getColumn()+1 >= currentWorldCopy.get(0).size()) {
+    private Boolean southEastNeighbourIsTrue(Coordinate coordinate) {
+        if (coordinate.getRow()+1 >= currentWorld.size()
+                || coordinate.getColumn()+1 >= currentWorld.get(0).size()) {
             return false;
         }
-        return currentWorldCopy.get(coordinate.getRow()+1).get(coordinate.getColumn()+1);
+        return currentWorld.get(coordinate.getRow()+1).get(coordinate.getColumn()+1);
     }
 
-    private boolean southNeighbourIsTrue(Coordinate coordinate) {
-        if (coordinate.getRow()+1 >= currentWorldCopy.size()) {
+    private Boolean southNeighbourIsTrue(Coordinate coordinate) {
+        if (coordinate.getRow()+1 >= currentWorld.size()) {
             return false;
         }
-        return currentWorldCopy.get(coordinate.getRow()+1).get(coordinate.getColumn());
+        return currentWorld.get(coordinate.getRow()+1).get(coordinate.getColumn());
     }
 
-    private boolean southWestNeighbourIsTrue(Coordinate coordinate) {
-        if (coordinate.getRow()+1 >= currentWorldCopy.get(0).size()
+    private Boolean southWestNeighbourIsTrue(Coordinate coordinate) {
+        if (coordinate.getRow()+1 >= currentWorld.get(0).size()
                 || coordinate.getColumn()-1 < 0) {
             return false;
         }
-        return currentWorldCopy.get(coordinate.getRow()+1).get(coordinate.getColumn()-1);
+        return currentWorld.get(coordinate.getRow()+1).get(coordinate.getColumn()-1);
     }
 
-    private boolean westNeighbourIsTrue(Coordinate coordinate) {
+    private Boolean westNeighbourIsTrue(Coordinate coordinate) {
         if (coordinate.getColumn()-1 < 0) {
             return false;
         }
-        return currentWorldCopy.get(coordinate.getRow()).get(coordinate.getColumn()-1);
+        return currentWorld.get(coordinate.getRow()).get(coordinate.getColumn()-1);
     }
 
-    private boolean northWestNeighbourIsTrue(Coordinate coordinate) {
+    private Boolean northWestNeighbourIsTrue(Coordinate coordinate) {
         if (coordinate.getRow()-1 < 0
                 || coordinate.getColumn()-1 < 0) {
             return false;
         }
-        return currentWorldCopy.get(coordinate.getRow()-1).get(coordinate.getColumn()-1);
+        return currentWorld.get(coordinate.getRow()-1).get(coordinate.getColumn()-1);
     }
 
-    private boolean northNeighbourIsTrue(Coordinate coordinate) {
+    private Boolean northNeighbourIsTrue(Coordinate coordinate) {
         if (coordinate.getRow()-1 < 0) {
             return false;
         }
-        return currentWorldCopy.get(coordinate.getRow()-1).get(coordinate.getColumn());
+        return currentWorld.get(coordinate.getRow()-1).get(coordinate.getColumn());
 
 
     }
 
-    private boolean northEastNeighbourIsTrue(Coordinate coordinate) {
+    private Boolean northEastNeighbourIsTrue(Coordinate coordinate) {
         if (coordinate.getRow()-1 < 0
-                || coordinate.getColumn()-1 < 0) {
+                || coordinate.getColumn()+1 >= currentWorld.get(0).size()) {
             return false;
         }
-        return currentWorldCopy.get(coordinate.getRow()-1).get(coordinate.getColumn()-1);
+        return currentWorld.get(coordinate.getRow()-1).get(coordinate.getColumn()+1);
     }
+
 }
