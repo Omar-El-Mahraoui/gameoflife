@@ -6,14 +6,17 @@ Using Gradle, Angular (4+) and Spring Boot (1.5.8)
 
 ## Usage
 
-- Start the backend by running GameOfLifeApplication.java
+- If it's your first time using this application, read the **First time usage** section first... :)
+- Start the backend by running `GameOfLifeApplication.java`
 - Start the frontend with command `npm start` from inside `gameoflife-ui/gameoflife-app`
 
 ## First time usage
 
-- Install Node.js
-- Install Npm
-- Run `npm install` from inside from inside `gameoflife-ui/gameoflife-app`
+- Install Node.js (it will also install npm)
+- After installation
+  - run `node --version` from inside the terminal, if it's correctly installed it will return a version number
+  - run `npm --version` from inside the terminal, if it's correctly installed it will return a version number
+- Run `npm install` from inside `gameoflife-ui/gameoflife-app`
 
 ## Some tips
 
